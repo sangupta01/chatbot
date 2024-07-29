@@ -9,12 +9,12 @@
 import os
 import re
 from dotenv import load_dotenv
-from langchain.document_loaders import PyPDFLoader
-from langchain.document_loaders import Docx2txtLoader
-from langchain.document_loaders import TextLoader
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.vectorstores import Chroma
-from langchain.chat_models import ChatOpenAI
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import Docx2txtLoader
+from langchain_community.document_loaders import TextLoader
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.vectorstores import Chroma
+from langchain_openai import ChatOpenAI
 from langchain.chains import ConversationalRetrievalChain
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.prompts import PromptTemplate
@@ -47,7 +47,7 @@ documents = text_splitter.split_documents(documents)
 persist_directory = "./data"
 model = "gpt-3.5-turbo"
 # model = "gpt-4"
-embedding = OpenAIEmbeddings(model=model)
+embedding = OpenAIEmbeddings()
 if persist_directory and os.path.exists(persist_directory):
     vectordb = Chroma(persist_directory=persist_directory, embedding_function=embedding)
 else:
@@ -105,7 +105,7 @@ def handle_app_mention_events(event, say, logger):
 
 def handle_query(user, query, say):
     print(f"{user}: {query}")
-    result = qa_chain({"question": query, "chat_history": chat_history})
+    result = qa_chain.invoke({"question": query, "chat_history": chat_history})
     output = result["answer"]
     chat_history.append((query, output))
     say(output)
